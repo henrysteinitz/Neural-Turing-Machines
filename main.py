@@ -1,15 +1,17 @@
 import tensorflow as tf
 import numpy as np
 from math import cosine_sim
-from modules import control
+from control import control
+from focus import foucus
 
+N = 100
+M =
 INPUT_WIDTH = 8
 CONTROLLER_INPUT_WIDTH = 2 * INPUT_WIDTH
 CONTROLLER_HIDDEN_WIDTH = 24
 CONTROLLER_OUTPUT_WIDTH =
 KEY_VECTOR_WIDTH = INPUT_WIDTH
-
-MEMORY_HEIGHT = 100
+MEMORY_HEIGHT = M
 
 # Feedforward Controller
 controller_weights_1 = tf.Variable(tf.truncated_normal([
