@@ -12,7 +12,6 @@ def interpolate(read_interpolation_gate, w_c, prev_w):
 def shift(w_g, shifter, shift_rule=[-1, 0, 1]):
     # We'll use a shifter of length 3 corresponding to [-1, 0 , 1] shifts
 
-
 def sharpen(w_sftd, sharpener):
     w = tf.map_fn(lambda x: tf.pow(x, sharpener), w_sftd)
     return w / tf.sum(w)
