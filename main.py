@@ -24,10 +24,7 @@ controller_weights_2 = tf.Variable(tf.truncated_normal([
 # Memory Matrix
 memory_matrix = tf.placeholder(tf.zeros([MEMORY_WIDTH, MEMORY_HEIGHT]))
 
-
 tf.while_loop():
-
-
     attention = # Make this a column vector
     erase_weights = # Make this a row vector
     write_weights = # Make this a row vector
