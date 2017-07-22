@@ -1,8 +1,8 @@
-#Neural Turing Machines
+# Neural Turing Machines
 
-##Overview
+## Overview
 
 A Neural Turing Machine is neural network with augmented memory invented by
 Alex Graves, Greg Wayne, and Ivo Danihelka in 2014.
 
-##How It Works
+## How It Works
