@@ -10,7 +10,10 @@ def interpolate(read_interpolation_gate, w_c, prev_w):
     return interpolation_gate * w_c + (1 - interpolation_gate) * prev_w
 
 def shift(w_g, shifter, shift_rule=[-1, 0, 1]):
-    # We'll use a shifter of length 3 corresponding to [-1, 0 , 1] shifts
+    w_sftd = tf.zeros(w_g.shape())
+    for i, n in enumerate(shift_rule):
+        w_sftd += shifter[i] * roll(w_g, n)
+    return w_sftd
 
 def sharpen(w_sftd, sharpener):
     w = tf.map_fn(lambda x: tf.pow(x, sharpener), w_sftd)
