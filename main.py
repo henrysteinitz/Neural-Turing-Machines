@@ -18,7 +18,7 @@ inp = tf.placeholder([INPUT_SIZE, None])
 given_out = tf.plaeholder([INPUT_SIZE, None])
 
 # Initial values
-memory_matrix = tf.zeros([INPUT_SIZE, MEMORY_SIZE]))
+memory_matrix = tf.zeros([INPUT_SIZE, MEMORY_SIZE])
 read_out = tf.zeros([INPUT_SIZE])
 read_attention = tf.zeros([MEMORY_SIZE])
 write_attention = tf.zeros([MEMORY_SIZE])
