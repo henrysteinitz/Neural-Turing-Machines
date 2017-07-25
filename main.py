@@ -15,6 +15,7 @@ SHARPENER_SIZE = 1
 
 session = tf.Session()
 inp = tf.placeholder([INPUT_SIZE, None])
+given_out = tf.plaeholder([INPUT_SIZE, None])
 
 # Initial values
 memory_matrix = tf.zeros([INPUT_SIZE, MEMORY_SIZE]))
@@ -61,10 +62,19 @@ write_weights = {
     ])),
 }
 
+result = tf.constant(np.array([]))
+
 # Build recurrent graph
-tf.while_loop():
+i = tf.constant(0)
+think_vars = (inp, read_out, hidden_weights, read_weights, write_weights,
+    memory_matrix, read_attention, write_attention, result, i)
+
+def think(inp, i, read_out, hidden_weights, read_weights, write_weights,
+    memory_matrix, read_attention, write_attention, result):
     read_controls, write_controls, write_vector, erase_vector, out = \
-        control(inp, read_out, hidden_weights, read_weights, write_weights)
+        control(inp[i, :], read_out, hidden_weights, read_weights, write_weights)
+    result = tf.concat(result, out)
+
     read_attention = focus(memory_matrix, read_attention, \
         read_controls['key_vector'], read_controls['key_strength'], \
         read_controls['shifter'], read_controls['sharpener'])
@@ -75,10 +85,18 @@ tf.while_loop():
     read_out = tf.transpose(read_attention * tf.transpose(memory_matrix))
     memory_matrix = memory_matrix * (1 - erase_vector * write_attention)
     memory_matrix += write_vector * attention
+    i += 1
 
-# Choose Optimizer
-optimizer = tf.train.GradientDescentOptimizer()
+def think_check(inp, i, *_):
+    return i < 2 * inp.shape()[1]
+
+tf.while_loop(think_check, think, think_vars)
+
+# Choose optimizer and compute loss
+optimizer = tf.train.GradientDescentOptimizer(.01)
+loss = tf.reduce_mean(tf.square(given_out - out))
+train_op = optimizer.minimize(loss) # We might have to break this up for gradient clipping
 
 # Run tasks
-copy_task(session)
+copy_task(session, train_op)
 session.close()
