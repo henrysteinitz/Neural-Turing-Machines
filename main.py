@@ -1,7 +1,7 @@
 import tensorflow as tf
 import numpy as np
 from control import control
-from focus import foucus
+from focus import focus
 from tasks import copy_task
 
 INPUT_SIZE = 8

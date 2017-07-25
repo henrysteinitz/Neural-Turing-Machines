@@ -1,5 +1,5 @@
 import tensorflow as tf
-from math import cosine_sim
+from helpers import cosine_sim
 from functools import partial
 
 def content_focus(memory_matrix, key_vector, key_strengh):

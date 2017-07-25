@@ -20,14 +20,14 @@ def copy_task(session, train_op):
     test_outs = []
 
     # Train Loop
-    for in range(len(train_inps)):
+    for i in range(len(train_inps)):
         session.run(train_op, feed_dict={
             inp: train_inps[i],
             given_out: train_outs[i]
         })
 
     # Test Loop
-    for in range(len(test_inps)):
+    for i in range(len(test_inps)):
         next_out = session.run(out, feed_dict={
             inp: test_inps[i]
         })

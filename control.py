@@ -36,7 +36,7 @@ def io_control(hidden_state, io_weights):
     key_strength = key_strengh_out(hidden_state, io_weights['key_strength'])
     shifter = shifter_out(hidden_state, io_weights['shifter'])
     sharpener = sharpener_out(hidden_state, io_weights['sharpener'])
-    return = {
+    return {
         'key_vector': key_vector,
         'key_strength': key_strength,
         'shifter': shifter,
