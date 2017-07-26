@@ -14,8 +14,8 @@ SHIFTER_SIZE = 3
 SHARPENER_SIZE = 1
 
 session = tf.Session()
-inp = tf.placeholder([INPUT_SIZE, None])
-given_out = tf.plaeholder([INPUT_SIZE, None])
+inp = tf.placeholder(tf.float32, shape=[INPUT_SIZE, None])
+given_out = tf.placeholder(tf.float32, shape=[INPUT_SIZE, None])
 
 # Initial values
 memory_matrix = tf.zeros([INPUT_SIZE, MEMORY_SIZE])
