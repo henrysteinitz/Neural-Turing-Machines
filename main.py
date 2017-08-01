@@ -5,10 +5,10 @@ from focus import focus
 from tasks import copy_task
 
 INPUT_SIZE = 8
-MAX_INPUT_LENGTH = 12
+MAX_INPUT_LENGTH = 8
 MEMORY_SIZE = 20
 CONTROLLER_INPUT_SIZE = 2 * INPUT_SIZE
-CONTROLLER_HIDDEN_SIZE = 24
+CONTROLLER_HIDDEN_SIZE = 100
 OUTPUT_SIZE = INPUT_SIZE
 KEY_VECTOR_SIZE = INPUT_SIZE
 KEY_STRENGTH_SIZE = 1
@@ -18,11 +18,10 @@ SHARPENER_SIZE = 1
 
 inp = tf.placeholder(tf.float32, shape=[INPUT_SIZE, None], name='inp')
 given_out = tf.placeholder(tf.float32, shape=[INPUT_SIZE, None], name='given_out')
-print(given_out)
 
 # Initial values
-memory_matrix = tf.zeros([INPUT_SIZE, MEMORY_SIZE])
-read_out = tf.zeros([INPUT_SIZE], dtype=tf.float32)
+memory_matrix = tf.ones([INPUT_SIZE, MEMORY_SIZE])
+read_out = tf.ones([INPUT_SIZE], dtype=tf.float32)
 read_attention = tf.zeros([MEMORY_SIZE])
 write_attention = tf.zeros([MEMORY_SIZE])
 
@@ -77,7 +76,7 @@ result = tf.constant(np.array([]), shape=[OUTPUT_SIZE, 0], dtype=tf.float32)
 
 # Build recurrent graph
 i = tf.constant(0)
-think_vars = [
+results = [
     inp,
     i,
     read_out,
@@ -101,7 +100,7 @@ think_vars = [
     output_weights
 ]
 
-def think(inp, i, read_out, hidden_weights, memory_matrix, read_attention,
+def body(inp, i, read_out, hidden_weights, memory_matrix, read_attention,
     write_attention, result, r_key_vector_weights, r_key_strength_weights,
     r_interpolation_weights, r_shifter_weights, r_sharpener_weights, w_key_vector_weights,
     w_key_strength_weights, w_interpolation_weights, w_shifter_weights, w_sharpener_weights,
@@ -126,7 +125,7 @@ def think(inp, i, read_out, hidden_weights, memory_matrix, read_attention,
     }
 
     read_controls, write_controls, write_vector, erase_vector, out = \
-        control(inp[i, :], read_out, hidden_weights, read_weights,
+        control(inp[:, i], read_out, hidden_weights, read_weights,
             write_weights, output_weights)
     result = tf.concat([result, tf.reshape(out, [-1, 1])], 1)
 
@@ -141,7 +140,7 @@ def think(inp, i, read_out, hidden_weights, memory_matrix, read_attention,
 
     read_out = tf.reshape(
         tf.matmul(memory_matrix, tf.reshape(read_attention, [-1, 1])),
-        [8]
+        [INPUT_SIZE]
     )
     memory_matrix = memory_matrix * (1 - tf.matmul(
         tf.reshape(erase_vector, [INPUT_SIZE, 1]),
@@ -177,46 +176,48 @@ def think(inp, i, read_out, hidden_weights, memory_matrix, read_attention,
         output_weights
     ]
 
-def think_check(inp, i, *_):
-    return i < 2 * tf.shape(inp)[1]
+# def think_check(inp, i, *_):
+#     return i < 2 * tf.shape(inp)[1]
 
+for i in range(MAX_INPUT_LENGTH*2):
+    results = body(*results)
 
-results = tf.while_loop(
-    think_check,
-    think,
-    loop_vars=think_vars,
-    shape_invariants=[
-        inp.get_shape(),
-        i.get_shape(),
-        read_out.get_shape(),
-        hidden_weights.get_shape(),
-        memory_matrix.get_shape(),
-        read_attention.get_shape(),
-        write_attention.get_shape(),
-        tf.TensorShape([INPUT_SIZE, None]),
-        r_key_vector_weights.get_shape(),
-        r_key_strength_weights.get_shape(),
-        r_interpolation_weights.get_shape(),
-        r_shifter_weights.get_shape(),
-        r_sharpener_weights.get_shape(),
-        w_key_vector_weights.get_shape(),
-        w_key_strength_weights.get_shape(),
-        w_interpolation_weights.get_shape(),
-        w_shifter_weights.get_shape(),
-        w_sharpener_weights.get_shape(),
-        write_vector_weights.get_shape(),
-        erase_vector_weights.get_shape(),
-        output_weights.get_shape(),
-    ]
-)
-print(given_out)
+# results = tf.while_loop(
+#     think_check,
+#     think,
+#     loop_vars=think_vars,
+#     shape_invariants=[
+#         inp.get_shape(),
+#         i.get_shape(),
+#         read_out.get_shape(),
+#         hidden_weights.get_shape(),
+#         memory_matrix.get_shape(),
+#         read_attention.get_shape(),
+#         write_attention.get_shape(),
+#         tf.TensorShape([INPUT_SIZE, None]),
+#         r_key_vector_weights.get_shape(),
+#         r_key_strength_weights.get_shape(),
+#         r_interpolation_weights.get_shape(),
+#         r_shifter_weights.get_shape(),
+#         r_sharpener_weights.get_shape(),
+#         w_key_vector_weights.get_shape(),
+#         w_key_strength_weights.get_shape(),
+#         w_interpolation_weights.get_shape(),
+#         w_shifter_weights.get_shape(),
+#         w_sharpener_weights.get_shape(),
+#         write_vector_weights.get_shape(),
+#         erase_vector_weights.get_shape(),
+#         output_weights.get_shape(),
+#     ]
+# )
 out = results[7]
 # Choose optimizer and compute loss
-optimizer = tf.train.GradientDescentOptimizer(.01)
+optimizer = tf.train.RMSPropOptimizer(.001, momentum=0.9)
 loss = tf.reduce_mean(tf.square(out - given_out))
 train_op = optimizer.minimize(loss) # We might have to break this up for gradient clipping
 
 # Run tasks
 session = tf.Session()
-copy_task(session, train_op, inp, given_out)
+session.run(tf.global_variables_initializer())
+copy_task(session, train_op, inp, given_out, out)
 session.close()

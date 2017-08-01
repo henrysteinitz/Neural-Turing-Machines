@@ -28,7 +28,7 @@ def shifter_out(hidden_state, weights):
     )
 
 def sharpener_out(hidden_state, weights):
-    return 1 / feedforward_layer(hidden_state, weights)
+    return 1 / (.9*feedforward_layer(hidden_state, weights) + .1)
 
 def hidden_control(inp, read_out, hidden_weights, kind):
     controller_input = tf.concat([inp, read_out], 0)

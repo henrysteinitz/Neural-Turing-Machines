@@ -3,7 +3,10 @@ from helpers import cosine_sim, roll
 from functools import partial
 
 def content_focus(memory_matrix, key_vector, key_strengh):
-    sim_vector = key_strengh * tf.map_fn(partial(cosine_sim, key_vector), memory_matrix)
+    sim_vector = key_strengh * tf.map_fn(
+        partial(cosine_sim, key_vector),
+        tf.transpose(memory_matrix)
+    )
     return tf.nn.softmax(sim_vector)
 
 def interpolate(interpolation_gate, w_c, prev_w):
