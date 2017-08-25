@@ -8,6 +8,6 @@ a Turing Machine whose finite-state controller is replaced
 with a simple feedforward or recurrent neural network. Differentiable versions
 of the read/write operations are then attached to the new controller, allowing
 the NTM to compute error derivatives using backpropagation. This means the
-entire system can learn by gradient methods.
+entire system can learn by gradient-based optimization.
 
 ## How It Works
